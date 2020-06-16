@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd">
+	<flow name="cli-practice-app-flow1" doc:id="660f4102-62d5-4597-ae8f-ef77a814bcb3" >
+		<http:listener doc:name="Listener" doc:id="5e2482e9-2b44-412f-b620-91dcbcbfcf01" config-ref="HTTP_Listener_config" path="/cli" allowedMethods="POST"/>
+		<http:request method="POST" doc:name="Request" doc:id="db2b3941-a7dd-488d-969a-27fdc5a7a032" config-ref="HTTP_Request_configuration" path="/hello">
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="c9b528a0-98f6-44c1-bde1-7e727f2103f7" message="Request 1 #[payload]"/>
+		<http:request method="GET" doc:name="Request" doc:id="98ed7f0c-aeda-41ab-a28f-f868728dd213" config-ref="HTTP_Request_configuration2" path="/hello2"/>
+		<logger level="INFO" doc:name="Logger" doc:id="d2a00a97-1a72-4594-acff-ef932ceeb877" message="Variable value :- #[vars.username]" />
+		<flow-ref doc:name="Flow Reference" doc:id="d408e03f-f9b9-4906-a7dd-a8b5edb753ee" name="cli-practice-app-hello"/>
+	</flow>
+	<flow name="cli-practice-app-hello2" doc:id="723a4e64-27b8-47e6-9ddd-386755aabc45" >
+		<http:listener doc:name="Listener" doc:id="c8ead67c-a393-44f2-bfb6-6d9655099816" config-ref="HTTP_Listener_config2" path="/hello2" allowedMethods="GET"/>
+		<ee:transform doc:name="Transform Message" doc:id="9d91300b-61e0-45eb-852c-47bf366c57f2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"flowname":"Hello2"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="394ca91d-1d66-4d50-ad44-7ba9054f7086" />
+	</flow>
+	<flow name="cli-practice-app-hello" doc:id="3e64d880-f4da-42e7-9eee-481c02eed496" >
+		<http:listener doc:name="Listener" doc:id="56cf01a8-cb33-48ca-997b-b8516c8bdfbe" config-ref="HTTP_Listener_config1" path="/hello" allowedMethods="POST"/>
+		<ee:transform doc:name="Transform Message" doc:id="5a3b95a1-fb1f-43f6-9e83-79aa0128dc25" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="66e46fe8-b61e-4bf0-8046-d740923566ab" message="Hello #[payload]"/>
+	</flow>
+</mule>

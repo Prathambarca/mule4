@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<munit:config name="cli-practice-app-test-suite.xml" />
+	<munit:test name="cli-practice-app-test-suite-cli-practice-app-flow1Test" description="Test" doc:id="cedd9fe1-566c-479a-85aa-7908771dbb4e" >
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="663f6d1c-7b6f-4607-9bed-778736358d8a" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="db2b3941-a7dd-488d-969a-27fdc5a7a032" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[MunitTools::getResourceAsString("validate-key.json")]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<ee:transform doc:name="Transform Message" doc:id="04f8a515-acb7-4d1f-b986-ad7b18941c8d" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"name":"Prathmesh",
+	"age":"28"
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<http:request method="POST" doc:name="Copy_of_Request" doc:id="ee2c76e6-9d05-488e-b4d3-c47096a65be7" config-ref="HTTP_Request_configuration1" path="/enroll">
+				<http:headers ><![CDATA[#[{
+	"name":"prathmesh",
+	"country":"France"
+}]]]></http:headers>
+			</http:request>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="30ecb9d0-4359-427f-a1ad-b105f54f5ffb" is="#[MunitTools::equalTo('valid')]" expression="#[payload.status]"/>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="b0b66eea-c1de-46c9-8e7c-dc405c19f7eb" is="#[MunitTools::equalTo('200')]" expression="#[attributes.statusCode]"/>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>
